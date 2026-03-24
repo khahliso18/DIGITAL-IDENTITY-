@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Blockchain Digital Identity System</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+margin:40px;
+}
+
+h1{
+text-align:center;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:8px;
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+input{
+padding:8px;
+margin:5px;
+width:22%;
+}
+
+button{
+padding:10px 20px;
+background:#2c7be5;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1a5ed6;
+}
+
+.block{
+padding:15px;
+margin-top:15px;
+border-radius:6px;
+border:2px solid #444;
+}
+
+.valid{
+background:#d4edda;
+}
+
+.invalid{
+background:#f8d7da;
+}
+
+.hash{
+font-size:12px;
+word-wrap:break-word;
+}
+
+.arrow{
+text-align:center;
+font-size:25px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Blockchain Digital Identity Ledger</h1>
+
+<h3>Issue Digital Credential</h3>
+
+<input id="issuer" placeholder="Issuer (University)">
+<input id="credential" placeholder="Credential (MBA Degree)">
+<input id="holder" placeholder="Holder Name">
+<input id="verifier" placeholder="Verifier (Employer)">
+
+<button onclick="addBlock()">Issue Credential</button>
+
+<div id="blockchain"></div>
+
+</div>
+
+<script>
+
+let blockchain=[]
+
+function hash(data){
+
+let h=0
+
+for(let i=0;i<data.length;i++){
+
+h=((h<<5)-h)+data.charCodeAt(i)
+h=h&h
+
+}
+
+return h.toString()
+
+}
+
+function addBlock(){
+
+let issuer=document.getElementById("issuer").value
+let credential=document.getElementById("credential").value
+let holder=document.getElementById("holder").value
+let verifier=document.getElementById("verifier").value
+
+let blockNumber=blockchain.length+1
+
+let timestamp=new Date().toLocaleTimeString()
+
+let prevHash="0"
+
+if(blockchain.length>0){
+
+prevHash=blockchain[blockchain.length-1].hash
+
+}
+
+let data=blockNumber+issuer+credential+holder+verifier+timestamp+prevHash
+
+let currentHash=hash(data)
+
+let block={
+number:blockNumber,
+issuer:issuer,
+credential:credential,
+holder:holder,
+verifier:verifier,
+timestamp:timestamp,
+prevHash:prevHash,
+hash:currentHash
+}
+
+blockchain.push(block)
+
+displayBlockchain()
+
+}
+
+function displayBlockchain(){
+
+let container=document.getElementById("blockchain")
+
+container.innerHTML=""
+
+blockchain.forEach((block,i)=>{
+
+let dataCheck=block.number+block.issuer+block.credential+block.holder+block.verifier+block.timestamp+block.prevHash
+
+let recalculatedHash=hash(dataCheck)
+
+let valid=recalculatedHash==block.hash
+
+let div=document.createElement("div")
+
+div.className="block "+(valid?"valid":"invalid")
+
+div.innerHTML=
+"<b>Block:</b> "+block.number+"<br>"+
+"<b>Issuer:</b> "+block.issuer+"<br>"+
+"<b>Credential:</b> "+block.credential+"<br>"+
+"<b>Holder:</b> "+block.holder+"<br>"+
+"<b>Verifier:</b> "+block.verifier+"<br>"+
+"<b>Timestamp:</b> "+block.timestamp+"<br><br>"+
+"<b>Previous Hash:</b><div class='hash'>"+block.prevHash+"</div><br>"+
+"<b>Current Hash:</b><div class='hash'>"+block.hash+"</div>"
+
+container.appendChild(div)
+
+if(i<blockchain.length-1){
+
+let arrow=document.createElement("div")
+arrow.className="arrow"
+arrow.innerHTML="⬇"
+container.appendChild(arrow)
+
+}
+
+})
+
+}
+
+</script>
+
+</body>
+</html>
